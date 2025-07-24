@@ -1,0 +1,77 @@
+[
+  {
+    "Id": 1,
+    "name": "Website Redesign",
+    "description": "Complete overhaul of the company website with modern design and improved user experience",
+    "teamMembers": ["John Smith", "Sarah Johnson", "Mike Chen", "Lisa Garcia"],
+    "status": "active",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "progress": 65,
+    "taskCounts": {
+      "total": 12,
+      "todo": 3,
+      "inProgress": 4,
+      "completed": 5
+    }
+  },
+  {
+    "Id": 2,
+    "name": "Mobile App Development",
+    "description": "Build a cross-platform mobile application for iOS and Android with React Native",
+    "teamMembers": ["Alex Rodriguez", "Emma Wilson", "David Park"],
+    "status": "active",
+    "createdAt": "2024-01-20T14:30:00Z",
+    "progress": 42,
+    "taskCounts": {
+      "total": 18,
+      "todo": 8,
+      "inProgress": 5,
+      "completed": 5
+    }
+  },
+  {
+    "Id": 3,
+    "name": "Marketing Campaign Q1",
+    "description": "Launch comprehensive marketing campaign for Q1 focusing on digital channels and brand awareness",
+    "teamMembers": ["Jennifer Lee", "Tom Anderson", "Maria Lopez", "Chris Taylor", "Nicole Brown"],
+    "status": "on-hold",
+    "createdAt": "2024-02-01T09:15:00Z",
+    "progress": 28,
+    "taskCounts": {
+      "total": 15,
+      "todo": 9,
+      "inProgress": 2,
+      "completed": 4
+    }
+  },
+  {
+    "Id": 4,
+    "name": "E-commerce Integration",
+    "description": "Integrate payment gateway and shopping cart functionality into existing platform",
+    "teamMembers": ["Kevin Zhang", "Rachel Adams"],
+    "status": "completed",
+    "createdAt": "2023-12-10T16:45:00Z",
+    "progress": 100,
+    "taskCounts": {
+      "total": 8,
+      "todo": 0,
+      "inProgress": 0,
+      "completed": 8
+    }
+  },
+  {
+    "Id": 5,
+    "name": "Data Analytics Dashboard",
+    "description": "Create comprehensive analytics dashboard for business intelligence and reporting",
+    "teamMembers": ["Steven Kim", "Anna Petrov", "James Wright"],
+    "status": "active",
+    "createdAt": "2024-02-05T11:20:00Z",
+    "progress": 73,
+    "taskCounts": {
+      "total": 10,
+      "todo": 2,
+      "inProgress": 3,
+      "completed": 5
+    }
+  }
+]
