@@ -15,6 +15,7 @@ import Dashboard from "@/components/pages/Dashboard";
 import ProjectDetail from "@/components/pages/ProjectDetail";
 import Layout from "@/components/pages/Layout";
 import Projects from "@/components/pages/Projects";
+import Team from "@/components/pages/Team";
 // Create auth context
 export const AuthContext = createContext(null);
 
@@ -133,15 +134,7 @@ function App() {
             <Route path="projects" element={<Projects />} />
             <Route path="project/:projectId" element={<ProjectDetail />} />
 <Route path="my-tasks" element={<MyTasks />} />
-            <Route path="team" element={<div className="flex items-center justify-center min-h-[400px]">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                          <span className="text-2xl">👥</span>
-                        </div>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Team Management</h2>
-                        <p className="text-gray-600">Team management features coming soon!</p>
-                      </div>
-                    </div>} />
+            <Route path="team" element={<Team />} />
             <Route path="settings" element={<div className="flex items-center justify-center min-h-[400px]">
                       <div className="text-center">
                         <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
