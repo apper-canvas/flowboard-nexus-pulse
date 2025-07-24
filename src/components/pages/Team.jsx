@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import ApperIcon from "@/components/ApperIcon";
-import Card from "@/components/atoms/Card";
+import { Card } from "@/components/atoms/Card";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
