@@ -101,6 +101,67 @@ export const activityService = {
       console.error("Error fetching recent activities:", error.message);
       throw error;
     }
+},
+
+  async getByProject(projectId, limit = 20) {
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "type_c" } },
+          { field: { Name: "user_c" } },
+          { field: { Name: "task_title_c" } },
+          { field: { Name: "project_name_c" } },
+          { field: { Name: "timestamp_c" } },
+          { field: { Name: "task_id_c" } },
+          { field: { Name: "project_id_c" } }
+        ],
+        where: [
+          {
+            FieldName: "project_id_c",
+            Operator: "EqualTo",
+            Values: [parseInt(projectId)]
+          }
+        ],
+        orderBy: [
+          {
+            fieldName: "timestamp_c",
+            sorttype: "DESC"
+          }
+        ],
+        pagingInfo: {
+          limit: limit,
+          offset: 0
+        }
+      };
+
+      const response = await apperClient.fetchRecords('app_Activity_c', params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      return response.data.map(activity => ({
+        Id: activity.Id,
+        type: activity.type_c,
+        user: activity.user_c,
+        taskTitle: activity.task_title_c,
+        projectName: activity.project_name_c,
+        timestamp: activity.timestamp_c,
+        taskId: activity.task_id_c?.Id || activity.task_id_c,
+        projectId: activity.project_id_c?.Id || activity.project_id_c
+      }));
+    } catch (error) {
+      console.error("Error fetching project activities:", error.message);
+      throw error;
+    }
   },
 
   async getByProjectId(projectId, limit = 20) {

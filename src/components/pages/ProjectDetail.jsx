@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import KanbanBoard from "@/components/organisms/KanbanBoard";
-import TaskModal from "@/components/organisms/TaskModal";
-import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import Progress from "@/components/atoms/Progress";
-import { Avatar, AvatarFallback } from "@/components/atoms/Avatar";
-import ApperIcon from "@/components/ApperIcon";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
 import { useTasks } from "@/hooks/useTasks";
 import { useComments } from "@/hooks/useComments";
 import { useProjects } from "@/hooks/useProjects";
 import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Team from "@/components/pages/Team";
+import KanbanBoard from "@/components/organisms/KanbanBoard";
+import TaskModal from "@/components/organisms/TaskModal";
+import Progress from "@/components/atoms/Progress";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import { Avatar, AvatarFallback } from "@/components/atoms/Avatar";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
@@ -231,7 +232,7 @@ const { projects, loading: projectLoading, updateProject } = useProjects();
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        {viewMode === "kanban" ? (
+{viewMode === "kanban" ? (
           <KanbanBoard
             tasks={tasks}
             onTaskUpdate={handleTaskUpdate}
