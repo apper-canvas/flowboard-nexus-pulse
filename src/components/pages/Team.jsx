@@ -15,7 +15,18 @@ const Team = () => {
   const { tasks, loading: tasksLoading } = useTasks();
   const [searchTerm, setSearchTerm] = useState("");
   const [teamMembers, setTeamMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [showMemberModal, setShowMemberModal] = useState(false);
 
+  const handleMemberClick = (member) => {
+    setSelectedMember(member);
+    setShowMemberModal(true);
+  };
+
+  const handleCloseMemberModal = () => {
+    setShowMemberModal(false);
+    setSelectedMember(null);
+  };
   useEffect(() => {
     if (projects.length > 0) {
       // Aggregate all team members from projects
@@ -163,13 +174,16 @@ const Team = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMembers.map((member, index) => (
-            <motion.div
+<motion.div
               key={member.name}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="p-6 hover:shadow-cardHover transition-all duration-200 border border-gray-200">
+              <Card 
+                className="p-6 hover:shadow-cardHover transition-all duration-200 border border-gray-200 cursor-pointer hover:border-primary/20 hover:bg-primary/5"
+                onClick={() => handleMemberClick(member)}
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <TeamMemberAvatar member={member.name} size="lg" />
@@ -242,6 +256,14 @@ const Team = () => {
                       }}
                     ></div>
                   </div>
+                </div>
+
+                {/* Click indicator */}
+                <div className="flex items-center justify-center mt-4 pt-2 border-t border-gray-100">
+                  <span className="text-xs text-gray-400 flex items-center gap-1">
+                    <ApperIcon name="Eye" size={12} />
+                    Click to view details
+                  </span>
                 </div>
               </Card>
             </motion.div>
