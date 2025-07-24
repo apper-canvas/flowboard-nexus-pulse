@@ -269,6 +269,181 @@ const Team = () => {
             </motion.div>
           ))}
         </div>
+)}
+
+      {/* Team Member Detail Modal */}
+      {showMemberModal && selectedMember && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <TeamMemberAvatar member={selectedMember.name} size="xl" />
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">{selectedMember.name}</h2>
+                    <p className="text-gray-600">Team Member</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCloseMemberModal}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ApperIcon name="X" size={20} className="text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary">{selectedMember.projects.length}</p>
+                    <p className="text-sm text-gray-600">Projects</p>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-warning/5 to-warning/10 p-4 rounded-lg border border-warning/20">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-warning">{selectedMember.activeTasks}</p>
+                    <p className="text-sm text-gray-600">Active Tasks</p>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-success/5 to-success/10 p-4 rounded-lg border border-success/20">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-success">{selectedMember.completedTasks}</p>
+                    <p className="text-sm text-gray-600">Completed</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Overview */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Overview</h3>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-700">Task Completion Rate</span>
+                      <span className="text-sm font-bold text-gray-900">
+                        {selectedMember.totalTasks > 0 
+                          ? Math.round((selectedMember.completedTasks / selectedMember.totalTasks) * 100)
+                          : 0
+                        }%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div 
+                        className="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-300"
+                        style={{ 
+                          width: `${selectedMember.totalTasks > 0 
+                            ? (selectedMember.completedTasks / selectedMember.totalTasks) * 100 
+                            : 0}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="text-center p-3 bg-white rounded-lg border">
+                      <p className="text-2xl font-bold text-gray-900">{selectedMember.totalTasks}</p>
+                      <p className="text-sm text-gray-600">Total Tasks</p>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded-lg border">
+                      <p className="text-2xl font-bold text-primary">
+                        {selectedMember.projects.filter(p => p.status === 'active').length}
+                      </p>
+                      <p className="text-sm text-gray-600">Active Projects</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Assignments */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Project Assignments</h3>
+                {selectedMember.projects.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <ApperIcon name="FolderOpen" size={32} className="mx-auto mb-2 text-gray-400" />
+                    <p>No projects assigned</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {selectedMember.projects.map(project => (
+                      <div key={project.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <ApperIcon name="Folder" size={16} className="text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900">{project.name}</h4>
+                              <p className="text-sm text-gray-600">Project Member</p>
+                            </div>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            project.status === 'active' ? 'bg-success/10 text-success' :
+                            project.status === 'completed' ? 'bg-primary/10 text-primary' :
+                            'bg-warning/10 text-warning'
+                          }`}>
+                            {project.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Task Breakdown */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Breakdown</h3>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="w-12 h-12 mx-auto mb-2 bg-gray-200 rounded-full flex items-center justify-center">
+                        <ApperIcon name="Clock" size={20} className="text-gray-600" />
+                      </div>
+                      <p className="text-xl font-bold text-gray-900">{selectedMember.activeTasks}</p>
+                      <p className="text-sm text-gray-600">In Progress</p>
+                    </div>
+                    <div className="text-center p-4 bg-success/5 rounded-lg">
+                      <div className="w-12 h-12 mx-auto mb-2 bg-success/10 rounded-full flex items-center justify-center">
+                        <ApperIcon name="CheckCircle" size={20} className="text-success" />
+                      </div>
+                      <p className="text-xl font-bold text-success">{selectedMember.completedTasks}</p>
+                      <p className="text-sm text-gray-600">Completed</p>
+                    </div>
+                    <div className="text-center p-4 bg-primary/5 rounded-lg">
+                      <div className="w-12 h-12 mx-auto mb-2 bg-primary/10 rounded-full flex items-center justify-center">
+                        <ApperIcon name="BarChart3" size={20} className="text-primary" />
+                      </div>
+                      <p className="text-xl font-bold text-primary">{selectedMember.totalTasks}</p>
+                      <p className="text-sm text-gray-600">Total Tasks</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
+              <div className="flex justify-end">
+                <button
+                  onClick={handleCloseMemberModal}
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   );
