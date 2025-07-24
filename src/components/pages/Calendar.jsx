@@ -267,9 +267,11 @@ const getTasksForDate = (date) => {
     );
   };
 
-  // Render week view
+// Render week view
   const renderWeekView = () => {
     const days = [];
+    const start = startOfWeek(new Date());
+    const end = endOfWeek(new Date());
     let day = start;
 
     while (day <= end) {
