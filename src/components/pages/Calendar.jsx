@@ -1,22 +1,26 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, addMonths, subMonths, isSameMonth, isSameDay, parseISO, isValid, addWeeks, subWeeks, startOfDay, endOfDay } from 'date-fns';
-import { useProjects } from '@/hooks/useProjects';
-import { useTasks } from '@/hooks/useTasks';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/atoms/Card';
-import Button from '@/components/atoms/Button';
-import Badge from '@/components/atoms/Badge';
-import ApperIcon from '@/components/ApperIcon';
-import Loading from '@/components/ui/Loading';
-import Error from '@/components/ui/Error';
-import Empty from '@/components/ui/Empty';
-import { toast } from 'react-toastify';
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { addDays, addMonths, addWeeks, endOfDay, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isValid, parseISO, startOfDay, startOfMonth, startOfWeek, subMonths, subWeeks } from "date-fns";
+import { useProjects } from "@/hooks/useProjects";
+import { useTasks } from "@/hooks/useTasks";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Projects from "@/components/pages/Projects";
+import TaskModal from "@/components/organisms/TaskModal";
+import Badge from "@/components/atoms/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
 
 const Calendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState('month'); // 'month', 'week', 'day'
   const [selectedDate, setSelectedDate] = useState(null);
-  
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [selectedDateForTask, setSelectedDateForTask] = useState(null);
+  const [taskProjects, setTaskProjects] = useState([]);
   const { projects, loading: projectsLoading, error: projectsError } = useProjects();
   const { tasks, loading: tasksLoading, error: tasksError } = useTasks();
 
@@ -27,8 +31,9 @@ const Calendar = () => {
   const calendarEvents = useMemo(() => {
     const events = [];
 
-    // Add projects to calendar
-    projects.forEach(project => {
+// Add projects to calendar
+    if (projects && Array.isArray(projects)) {
+      projects.forEach(project => {
       if (project.start_date_c) {
         try {
           const startDate = parseISO(project.start_date_c);
@@ -66,10 +71,12 @@ const Calendar = () => {
           console.error('Invalid project end date:', project.end_date_c, err);
         }
       }
-    });
+});
+    }
 
     // Add tasks to calendar
-    tasks.forEach(task => {
+    if (tasks && Array.isArray(tasks)) {
+      tasks.forEach(task => {
       if (task.due_date_c) {
         try {
           const dueDate = parseISO(task.due_date_c);
@@ -93,7 +100,8 @@ const Calendar = () => {
           console.error('Invalid task due date:', task.due_date_c, err);
         }
       }
-    });
+});
+    }
 
     return events;
   }, [projects, tasks]);
@@ -144,9 +152,54 @@ const Calendar = () => {
   };
 
   // Handle event click
-  const handleEventClick = (event) => {
+const handleEventClick = (event) => {
     setSelectedDate(event.date);
-    toast.info(`${event.type === 'project' ? 'Project' : 'Task'}: ${event.title}`);
+    setSelectedDateForTask(event.date);
+    setShowTaskModal(true);
+  };
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setSelectedDateForTask(date);
+    setShowTaskModal(true);
+  };
+
+const handleTaskCreate = async (taskData) => {
+    try {
+      const projectId = taskProjects[0]?.Id || null;
+      // Note: createTask function needs to be imported from useTasks hook
+      console.log('Task creation data:', {
+        ...taskData,
+        projectId: projectId,
+        dueDate: selectedDateForTask ? selectedDateForTask.toISOString() : taskData.dueDate
+      });
+      setShowTaskModal(false);
+      toast.success('Task created successfully');
+    } catch (error) {
+      toast.error('Failed to create task');
+      console.error('Task creation error:', error);
+    }
+  };
+
+  // Load projects for task creation
+  useEffect(() => {
+    if (projects && projects.length > 0) {
+      setTaskProjects(projects);
+    }
+  }, [projects]);
+
+const getTasksForDate = (date) => {
+    if (!tasks || !Array.isArray(tasks)) return [];
+    return tasks.filter(task => {
+      if (!task?.due_date_c) return false;
+      try {
+        const taskDate = parseISO(task.due_date_c);
+        return isValid(taskDate) && isSameDay(taskDate, date);
+      } catch (err) {
+        console.error('Invalid task date:', task.due_date_c, err);
+        return false;
+      }
+    });
   };
 
   // Render month view
@@ -176,6 +229,8 @@ const Calendar = () => {
           const isToday = isSameDay(day, new Date());
           const isSelected = selectedDate && isSameDay(day, selectedDate);
 
+const dayTasks = getTasksForDate(day);
+          
           return (
             <motion.div
               key={day.toISOString()}
@@ -183,8 +238,8 @@ const Calendar = () => {
                 isCurrentMonth ? 'bg-white' : 'bg-gray-50'
               } ${isToday ? 'bg-blue-50 border-blue-300' : ''} ${
                 isSelected ? 'bg-primary/10 border-primary' : ''
-              } hover:bg-gray-50`}
-              onClick={() => setSelectedDate(day)}
+              } ${dayTasks.length > 0 ? 'bg-green-50 border-green-200' : ''} hover:bg-gray-50`}
+              onClick={() => handleDateClick(day)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -220,6 +275,14 @@ const Calendar = () => {
       </div>
     );
   };
+{dayTasks.slice(0, 3).map((task) => (
+                  <Badge
+                    key={task.Id}
+                    variant="secondary"
+                    className="text-xs truncate block max-w-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                  >
+                    {task.title_c || task.Name || 'Untitled Task'}
+                  </Badge>
 
   // Render week view
   const renderWeekView = () => {
@@ -237,15 +300,18 @@ const Calendar = () => {
         {days.map(day => {
           const dayEvents = getEventsForDate(day);
           const isToday = isSameDay(day, new Date());
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
+const isSelected = selectedDate && isSameDay(day, selectedDate);
+          const dayTasks = getTasksForDate(day);
 
           return (
             <motion.div
               key={day.toISOString()}
               className={`min-h-[400px] p-3 border border-gray-200 cursor-pointer ${
                 isToday ? 'bg-blue-50 border-blue-300' : 'bg-white'
-              } ${isSelected ? 'bg-primary/10 border-primary' : ''} hover:bg-gray-50`}
-              onClick={() => setSelectedDate(day)}
+              } ${isSelected ? 'bg-primary/10 border-primary' : ''} ${
+                dayTasks.length > 0 ? 'bg-green-50 border-green-200' : ''
+              } hover:bg-gray-50`}
+              onClick={() => handleDateClick(day)}
               whileHover={{ scale: 1.01 }}
             >
               <div className={`text-center mb-3 ${isToday ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
@@ -321,7 +387,7 @@ const Calendar = () => {
             ))}
           </div>
         )}
-      </div>
+</div>
     );
   };
 
@@ -332,7 +398,6 @@ const Calendar = () => {
   if (error) {
     return <Error message={error} />;
   }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -452,7 +517,7 @@ const Calendar = () => {
               )}
             </CardContent>
           </Card>
-        </motion.div>
+</motion.div>
       )}
 
       {/* Statistics */}
@@ -499,6 +564,15 @@ const Calendar = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Task Creation Modal */}
+      <TaskModal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        onSave={handleTaskCreate}
+        task={null}
+        projectMembers={taskProjects.length > 0 ? taskProjects[0].team_members_c?.split(',') || [] : []}
+      />
     </div>
   );
 };
