@@ -1,3 +1,5 @@
+import React from "react";
+import Error from "@/components/ui/Error";
 export const projectService = {
   async getAll() {
     try {
@@ -7,10 +9,9 @@ export const projectService = {
         apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
 
-      const params = {
-fields: [
+const params = {
+        fields: [
           { field: { Name: "Name" } },
-          { field: { Name: "notes_c" } },
           { field: { Name: "description_c" } },
           { field: { Name: "team_members_c" } },
           { field: { Name: "status_c" } },
@@ -30,11 +31,10 @@ fields: [
         throw new Error(response.message);
       }
 
-      return response.data.map(project => ({
+return response.data.map(project => ({
         Id: project.Id,
         name: project.Name,
-description: project.description_c,
-        notes: project.notes_c || '',
+        description: project.description_c,
         teamMembers: project.team_members_c ? project.team_members_c.split(',') : [],
         status: project.status_c,
         createdAt: project.created_at_c,
@@ -60,11 +60,10 @@ description: project.description_c,
         apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
 
-      const params = {
+const params = {
         fields: [
-{ field: { Name: "Name" } },
+          { field: { Name: "Name" } },
           { field: { Name: "description_c" } },
-          { field: { Name: "notes_c" } },
           { field: { Name: "team_members_c" } },
           { field: { Name: "status_c" } },
           { field: { Name: "created_at_c" } },
@@ -83,12 +82,11 @@ description: project.description_c,
         throw new Error(response.message);
       }
 
-      const project = response.data;
+const project = response.data;
       return {
         Id: project.Id,
         name: project.Name,
-description: project.description_c,
-        notes: project.notes_c || '',
+        description: project.description_c,
         teamMembers: project.team_members_c ? project.team_members_c.split(',') : [],
         status: project.status_c,
         createdAt: project.created_at_c,
@@ -114,11 +112,10 @@ description: project.description_c,
         apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       });
 
-      const params = {
+const params = {
         records: [{
-Name: projectData.name,
+          Name: projectData.name,
           description_c: projectData.description || '',
-          notes_c: projectData.notes || '',
           team_members_c: Array.isArray(projectData.teamMembers) ? projectData.teamMembers.join(',') : '',
           status_c: projectData.status || 'active',
           created_at_c: new Date().toISOString(),
@@ -146,7 +143,7 @@ Name: projectData.name,
           throw new Error("Failed to create project");
         }
         
-        if (successfulRecords.length > 0) {
+if (successfulRecords.length > 0) {
           const project = successfulRecords[0].data;
           return {
             Id: project.Id,
@@ -183,16 +180,16 @@ Name: projectData.name,
         Id: parseInt(id)
       };
 
-      // Only include fields that are being updated
+// Only include fields that are being updated
       if (updateData.name !== undefined) updateRecord.Name = updateData.name;
       if (updateData.description !== undefined) updateRecord.description_c = updateData.description;
       if (updateData.teamMembers !== undefined) {
         updateRecord.team_members_c = Array.isArray(updateData.teamMembers) ? updateData.teamMembers.join(',') : updateData.teamMembers;
       }
       if (updateData.status !== undefined) updateRecord.status_c = updateData.status;
-if (updateData.progress !== undefined) updateRecord.progress_c = updateData.progress;
-      if (updateData.notes !== undefined) updateRecord.notes_c = updateData.notes;
-      const params = {
+      if (updateData.progress !== undefined) updateRecord.progress_c = updateData.progress;
+      
+const params = {
         records: [updateRecord]
       };
 
@@ -213,13 +210,12 @@ if (updateData.progress !== undefined) updateRecord.progress_c = updateData.prog
         }
         
         if (successfulRecords.length > 0) {
-          const project = successfulRecords[0].data;
+const project = successfulRecords[0].data;
           return {
             Id: project.Id,
             name: project.Name,
             description: project.description_c,
-teamMembers: project.team_members_c ? project.team_members_c.split(',') : [],
-            notes: project.notes_c || '',
+            teamMembers: project.team_members_c ? project.team_members_c.split(',') : [],
             status: project.status_c,
             createdAt: project.created_at_c,
             progress: project.progress_c || 0,

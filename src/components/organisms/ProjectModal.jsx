@@ -7,10 +7,9 @@ import ApperIcon from "@/components/ApperIcon";
 import { toast } from "react-toastify";
 
 const ProjectModal = ({ project, isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-name: "",
+const [formData, setFormData] = useState({
+    name: "",
     description: "",
-    notes: "",
     teamMembers: [],
     status: "active"
   });
@@ -20,17 +19,15 @@ name: "",
 useEffect(() => {
     if (project) {
       setFormData({
-        name: project.name || "",
-description: project.description || "",
-        notes: project.notes || "",
+name: project.name || "",
+        description: project.description || "",
         teamMembers: project.teamMembers || [],
         status: project.status || "active"
       });
     } else {
       setFormData({
-        name: "",
-description: "",
-        notes: "",
+name: "",
+        description: "",
         teamMembers: [],
         status: "active"
       });
@@ -141,18 +138,6 @@ description: "",
               />
 </div>
 
-            {/* Notes */}
-            <div>
-              <Label htmlFor="notes">Notes</Label>
-              <textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Add project notes, requirements, or additional information..."
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
-              />
-            </div>
             {/* Status */}
             <div>
               <Label htmlFor="status">Status</Label>
