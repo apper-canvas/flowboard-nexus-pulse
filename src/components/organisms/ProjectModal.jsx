@@ -8,8 +8,9 @@ import { toast } from "react-toastify";
 
 const ProjectModal = ({ project, isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    name: "",
+name: "",
     description: "",
+    notes: "",
     teamMembers: [],
     status: "active"
   });
@@ -20,14 +21,16 @@ useEffect(() => {
     if (project) {
       setFormData({
         name: project.name || "",
-        description: project.description || "",
+description: project.description || "",
+        notes: project.notes || "",
         teamMembers: project.teamMembers || [],
         status: project.status || "active"
       });
     } else {
       setFormData({
         name: "",
-        description: "",
+description: "",
+        notes: "",
         teamMembers: [],
         status: "active"
       });
@@ -136,8 +139,20 @@ useEffect(() => {
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
               />
-            </div>
+</div>
 
+            {/* Notes */}
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Add project notes, requirements, or additional information..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+              />
+            </div>
             {/* Status */}
             <div>
               <Label htmlFor="status">Status</Label>
