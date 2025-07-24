@@ -10,14 +10,12 @@ const Sidebar = ({ projects = [], onNewProject }) => {
   const { projectId } = useParams();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const navigationItems = [
+const navigationItems = [
     { name: "Dashboard", path: "/dashboard", icon: "LayoutDashboard" },
     { name: "My Tasks", path: "/my-tasks", icon: "CheckSquare" },
-    { name: "Calendar", path: "/calendar", icon: "Calendar" },
     { name: "Team", path: "/team", icon: "Users" },
     { name: "Settings", path: "/settings", icon: "Settings" }
   ];
-
   const SidebarContent = () => (
     <div className="h-full flex flex-col bg-gradient-to-b from-white to-gray-50/80 backdrop-blur-sm border-r border-gray-200">
       {/* Logo */}

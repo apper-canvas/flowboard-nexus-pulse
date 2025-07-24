@@ -15,7 +15,6 @@ import Dashboard from "@/components/pages/Dashboard";
 import ProjectDetail from "@/components/pages/ProjectDetail";
 import Layout from "@/components/pages/Layout";
 import Projects from "@/components/pages/Projects";
-import Calendar from "@/components/pages/Calendar";
 // Create auth context
 export const AuthContext = createContext(null);
 
@@ -133,8 +132,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
             <Route path="project/:projectId" element={<ProjectDetail />} />
-            <Route path="my-tasks" element={<MyTasks />} />
-<Route path="calendar" element={<Calendar />} />
+<Route path="my-tasks" element={<MyTasks />} />
             <Route path="team" element={<div className="flex items-center justify-center min-h-[400px]">
                       <div className="text-center">
                         <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
