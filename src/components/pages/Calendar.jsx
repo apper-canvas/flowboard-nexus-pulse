@@ -215,78 +215,60 @@ const getTasksForDate = (date) => {
 
     return (
       <div className="grid grid-cols-7 gap-1">
-        {/* Header */}
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(dayName => (
-          <div key={dayName} className="p-3 text-center font-semibold text-gray-600 bg-gray-50 rounded-t-lg">
-            {dayName}
-          </div>
-        ))}
-        
-        {/* Days */}
-        {days.map((day, index) => {
-          const dayEvents = getEventsForDate(day);
-          const isCurrentMonth = isSameMonth(day, currentDate);
-          const isToday = isSameDay(day, new Date());
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
+    {/* Header */}
+    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(dayName => <div
+        key={dayName}
+        className="p-3 text-center font-semibold text-gray-600 bg-gray-50 rounded-t-lg">
+        {dayName}
+    </div>)}
+    {/* Days */}
+    {days.map((day, index) => {
+        const dayEvents = getEventsForDate(day);
+        const isCurrentMonth = isSameMonth(day, currentDate);
+        const isToday = isSameDay(day, new Date());
+        const isSelected = selectedDate && isSameDay(day, selectedDate);
+        const dayTasks = getTasksForDate(day);
 
-const dayTasks = getTasksForDate(day);
-          
-          return (
+        return (
             <motion.div
-              key={day.toISOString()}
-              className={`min-h-[120px] p-2 border border-gray-200 cursor-pointer transition-all duration-200 ${
-                isCurrentMonth ? 'bg-white' : 'bg-gray-50'
-              } ${isToday ? 'bg-blue-50 border-blue-300' : ''} ${
-                isSelected ? 'bg-primary/10 border-primary' : ''
-              } ${dayTasks.length > 0 ? 'bg-green-50 border-green-200' : ''} hover:bg-gray-50`}
-              onClick={() => handleDateClick(day)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className={`text-sm font-medium mb-1 ${
-                isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-              } ${isToday ? 'text-blue-600 font-bold' : ''}`}>
-                {format(day, 'd')}
-              </div>
-              
-              <div className="space-y-1">
-                {dayEvents.slice(0, 3).map(event => (
-                  <motion.div
-                    key={event.id}
-                    className={`text-xs px-2 py-1 rounded ${event.color} ${event.textColor} truncate cursor-pointer`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEventClick(event);
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {event.title}
-                  </motion.div>
-                ))}
-                {dayEvents.length > 3 && (
-                  <div className="text-xs text-gray-500 font-medium">
-                    +{dayEvents.length - 3} more
-                  </div>
-                )}
-              </div>
+                key={day.toISOString()}
+                className={`min-h-[120px] p-2 border border-gray-200 cursor-pointer transition-all duration-200 ${isCurrentMonth ? "bg-white" : "bg-gray-50"} ${isToday ? "bg-blue-50 border-blue-300" : ""} ${isSelected ? "bg-primary/10 border-primary" : ""} ${dayTasks.length > 0 ? "bg-green-50 border-green-200" : ""} hover:bg-gray-50`}
+                onClick={() => handleDateClick(day)}
+                whileHover={{
+                    scale: 1.02
+                }}
+                whileTap={{
+                    scale: 0.98
+                }}>
+                <div
+                    className={`text-sm font-medium mb-1 ${isCurrentMonth ? "text-gray-900" : "text-gray-400"} ${isToday ? "text-blue-600 font-bold" : ""}`}>
+                    {format(day, "d")}
+                </div>
+                <div className="space-y-1">
+                    {dayEvents.slice(0, 3).map(event => <motion.div
+                        key={event.id}
+                        className={`text-xs px-2 py-1 rounded ${event.color} ${event.textColor} truncate cursor-pointer`}
+                        onClick={e => {
+                            e.stopPropagation();
+                            handleEventClick(event);
+                        }}
+                        whileHover={{
+                            scale: 1.05
+                        }}>
+                        {event.title}
+                    </motion.div>)}
+                    {dayEvents.length > 3 && <div className="text-xs text-gray-500 font-medium">+{dayEvents.length - 3}more
+                                          </div>}
+                </div>
             </motion.div>
-          );
-        })}
-      </div>
+        );
+    })}
+</div>
     );
   };
-{dayTasks.slice(0, 3).map((task) => (
-                  <Badge
-                    key={task.Id}
-                    variant="secondary"
-                    className="text-xs truncate block max-w-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                  >
-                    {task.title_c || task.Name || 'Untitled Task'}
-                  </Badge>
 
   // Render week view
   const renderWeekView = () => {
-    const { start, end } = getDateRange();
     const days = [];
     let day = start;
 
@@ -400,180 +382,165 @@ const isSelected = selectedDate && isSameDay(day, selectedDate);
   }
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card>
+    {/* Header */}
+    <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <CardTitle className="flex items-center space-x-2">
-                <ApperIcon name="Calendar" size={24} />
-                <span>Calendar</span>
-              </CardTitle>
-              
-              {/* View Mode Selector */}
-              <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-                {['month', 'week', 'day'].map(mode => (
-                  <Button
-                    key={mode}
-                    variant={viewMode === mode ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode(mode)}
-                    className="capitalize"
-                  >
-                    {mode}
-                  </Button>
-                ))}
-              </div>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                    <CardTitle className="flex items-center space-x-2">
+                        <ApperIcon name="Calendar" size={24} />
+                        <span>Calendar</span>
+                    </CardTitle>
+                    {/* View Mode Selector */}
+                    <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                        {["month", "week", "day"].map(mode => <Button
+                            key={mode}
+                            variant={viewMode === mode ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => setViewMode(mode)}
+                            className="capitalize">
+                            {mode}
+                        </Button>)}
+                    </div>
+                </div>
+                {/* Navigation */}
+                <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" onClick={navigateToday}>Today
+                                      </Button>
+                    <Button variant="outline" size="sm" onClick={navigatePrevious}>
+                        <ApperIcon name="ChevronLeft" size={16} />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={navigateNext}>
+                        <ApperIcon name="ChevronRight" size={16} />
+                    </Button>
+                </div>
             </div>
-
-            {/* Navigation */}
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={navigateToday}>
-                Today
-              </Button>
-              <Button variant="outline" size="sm" onClick={navigatePrevious}>
-                <ApperIcon name="ChevronLeft" size={16} />
-              </Button>
-              <Button variant="outline" size="sm" onClick={navigateNext}>
-                <ApperIcon name="ChevronRight" size={16} />
-              </Button>
+            {/* Current Period Display */}
+            <div className="text-xl font-semibold text-gray-900 mt-2">
+                {viewMode === "month" && format(currentDate, "MMMM yyyy")}
+                {viewMode === "week" && `${format(startOfWeek(currentDate), "MMM d")} - ${format(endOfWeek(currentDate), "MMM d, yyyy")}`}
+                {viewMode === "day" && format(currentDate, "EEEE, MMMM d, yyyy")}
             </div>
-          </div>
-
-          {/* Current Period Display */}
-          <div className="text-xl font-semibold text-gray-900 mt-2">
-            {viewMode === 'month' && format(currentDate, 'MMMM yyyy')}
-            {viewMode === 'week' && `${format(startOfWeek(currentDate), 'MMM d')} - ${format(endOfWeek(currentDate), 'MMM d, yyyy')}`}
-            {viewMode === 'day' && format(currentDate, 'EEEE, MMMM d, yyyy')}
-          </div>
         </CardHeader>
-
         <CardContent>
-          <motion.div
-            key={`${viewMode}-${currentDate.toISOString()}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {viewMode === 'month' && renderMonthView()}
-            {viewMode === 'week' && renderWeekView()}
-            {viewMode === 'day' && renderDayView()}
-          </motion.div>
+            <motion.div
+                key={`${viewMode}-${currentDate.toISOString()}`}
+                initial={{
+                    opacity: 0,
+                    y: 20
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0
+                }}
+                exit={{
+                    opacity: 0,
+                    y: -20
+                }}
+                transition={{
+                    duration: 0.3
+                }}>
+                {viewMode === "month" && renderMonthView()}
+                {viewMode === "week" && renderWeekView()}
+                {viewMode === "day" && renderDayView()}
+            </motion.div>
         </CardContent>
-      </Card>
-
-      {/* Event Summary */}
-      {selectedDate && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          <Card>
+    </Card>
+    {/* Event Summary */}
+    {selectedDate && <motion.div
+        initial={{
+            opacity: 0,
+            y: 20
+        }}
+        animate={{
+            opacity: 1,
+            y: 0
+        }}
+        className="space-y-4">
+        <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Events for {format(selectedDate, 'MMMM d, yyyy')}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedDate(null)}
-                >
-                  <ApperIcon name="X" size={16} />
-                </Button>
-              </CardTitle>
+                <CardTitle className="flex items-center justify-between">
+                    <span>Events for {format(selectedDate, "MMMM d, yyyy")}</span>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedDate(null)}>
+                        <ApperIcon name="X" size={16} />
+                    </Button>
+                </CardTitle>
             </CardHeader>
             <CardContent>
-              {getEventsForDate(selectedDate).length === 0 ? (
-                <Empty 
-                  title="No events"
-                  description="No projects or tasks scheduled for this date."
-                />
-              ) : (
-                <div className="space-y-3">
-                  {getEventsForDate(selectedDate).map(event => (
-                    <div
-                      key={event.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
-                      onClick={() => handleEventClick(event)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Badge className={`${event.color} ${event.textColor}`}>
-                          {event.type === 'project' ? 'Project' : 'Task'}
-                        </Badge>
-                        <div>
-                          <div className="font-medium">{event.title}</div>
-                          {event.data.description_c && (
-                            <div className="text-sm text-gray-600 truncate max-w-md">
-                              {event.data.description_c}
+                {getEventsForDate(selectedDate).length === 0 ? <Empty
+                    title="No events"
+                    description="No projects or tasks scheduled for this date." /> : <div className="space-y-3">
+                    {getEventsForDate(selectedDate).map(event => <div
+                        key={event.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                        onClick={() => handleEventClick(event)}>
+                        <div className="flex items-center space-x-3">
+                            <Badge className={`${event.color} ${event.textColor}`}>
+                                {event.type === "project" ? "Project" : "Task"}
+                            </Badge>
+                            <div>
+                                <div className="font-medium">{event.title}</div>
+                                {event.data.description_c && <div className="text-sm text-gray-600 truncate max-w-md">
+                                    {event.data.description_c}
+                                </div>}
                             </div>
-                          )}
                         </div>
-                      </div>
-                      <ApperIcon name="ChevronRight" size={16} />
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <ApperIcon name="ChevronRight" size={16} />
+                    </div>)}
+                </div>}
             </CardContent>
-          </Card>
-</motion.div>
-      )}
-
-      {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <ApperIcon name="FolderOpen" size={20} className="text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{projects.length}</div>
-                <div className="text-sm text-gray-600">Total Projects</div>
-              </div>
-            </div>
-          </CardContent>
         </Card>
-
+    </motion.div>}
+    {/* Statistics */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <ApperIcon name="CheckSquare" size={20} className="text-yellow-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{tasks.length}</div>
-                <div className="text-sm text-gray-600">Total Tasks</div>
-              </div>
-            </div>
-          </CardContent>
+            <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                        <ApperIcon name="FolderOpen" size={20} className="text-blue-600" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{projects.length}</div>
+                        <div className="text-sm text-gray-600">Total Projects</div>
+                    </div>
+                </div>
+            </CardContent>
         </Card>
-
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <ApperIcon name="Calendar" size={20} className="text-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{calendarEvents.length}</div>
-                <div className="text-sm text-gray-600">Calendar Events</div>
-              </div>
-            </div>
-          </CardContent>
+            <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-100 rounded-lg">
+                        <ApperIcon name="CheckSquare" size={20} className="text-yellow-600" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{tasks.length}</div>
+                        <div className="text-sm text-gray-600">Total Tasks</div>
+                    </div>
+                </div>
+            </CardContent>
         </Card>
-      </div>
-
-      {/* Task Creation Modal */}
-      <TaskModal
+        <Card>
+            <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                        <ApperIcon name="Calendar" size={20} className="text-green-600" />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold">{calendarEvents.length}</div>
+                        <div className="text-sm text-gray-600">Calendar Events</div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+    {/* Task Creation Modal */}
+    <TaskModal
         isOpen={showTaskModal}
         onClose={() => setShowTaskModal(false)}
         onSave={handleTaskCreate}
         task={null}
-        projectMembers={taskProjects.length > 0 ? taskProjects[0].team_members_c?.split(',') || [] : []}
-      />
-    </div>
+        projectMembers={taskProjects.length > 0 ? taskProjects[0].team_members_c?.split(",") || [] : []} />
+</div>
   );
 };
 
