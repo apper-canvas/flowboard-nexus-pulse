@@ -319,11 +319,15 @@ export const taskService = {
     } catch (error) {
       console.error("Error deleting task:", error.message);
       throw error;
-    }
+}
   },
 
   async updateStatus(id, status) {
     return this.update(id, { status });
+  },
+
+  async updateAttachmentCount(id, count) {
+    return this.update(id, { attachment_count_c: count });
   },
 
   async getTaskCounts(projectId) {
@@ -341,7 +345,7 @@ export const taskService = {
         total: 0,
         todo: 0,
         inProgress: 0,
-completed: 0
+        completed: 0
       };
     }
   }

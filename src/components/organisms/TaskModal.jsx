@@ -9,6 +9,7 @@ import Progress from "@/components/atoms/Progress";
 import ApperIcon from "@/components/ApperIcon";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import { fileService } from "@/services/api/fileService";
 
 const TaskModal = ({ 
   task, 
@@ -20,7 +21,7 @@ const TaskModal = ({
   comments = [],
   onAddComment 
 }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: "",
     description: "",
     assignee: "",
@@ -31,8 +32,14 @@ const TaskModal = ({
   });
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // File upload states
+  const [files, setFiles] = useState([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     if (task) {
       setFormData({
         title: task.title || "",
@@ -43,6 +50,9 @@ const TaskModal = ({
         dueDate: task.dueDate ? format(new Date(task.dueDate), "yyyy-MM-dd") : "",
         progress: task.progress || 0
       });
+      
+      // Load files for existing task
+      loadTaskFiles();
     } else {
       setFormData({
         title: "",
@@ -53,10 +63,26 @@ const TaskModal = ({
         dueDate: "",
         progress: 0
       });
+      setFiles([]);
     }
   }, [task]);
 
-  const handleSubmit = async (e) => {
+  const loadTaskFiles = async () => {
+    if (!task?.Id) return;
+    
+    setLoadingFiles(true);
+    try {
+      const taskFiles = await fileService.getByTaskId(task.Id);
+      setFiles(taskFiles);
+    } catch (error) {
+      console.error("Error loading task files:", error);
+      toast.error("Failed to load attachments");
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
       toast.error("Task title is required");
@@ -67,7 +93,8 @@ const TaskModal = ({
     try {
       const taskData = {
         ...formData,
-        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null
+        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
+        attachmentCount: files.length
       };
 
       await onSave(taskData);
@@ -78,6 +105,147 @@ const TaskModal = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // File upload handlers
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    handleFileUpload(droppedFiles);
+  };
+
+  const handleFileSelect = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    handleFileUpload(selectedFiles);
+  };
+
+  const handleFileUpload = async (fileList) => {
+    if (!task?.Id) {
+      toast.error("Please save the task first before uploading files");
+      return;
+    }
+
+    const validFiles = fileList.filter(file => {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast.error(`File ${file.name} is too large. Max size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    const newUploadingFiles = validFiles.map(file => ({
+      file,
+      progress: 0,
+      id: Math.random().toString(36).substr(2, 9)
+    }));
+
+    setUploadingFiles(prev => [...prev, ...newUploadingFiles]);
+
+    for (const uploadingFile of newUploadingFiles) {
+      try {
+        const fileData = await fileService.uploadFile(
+          uploadingFile.file,
+          task.Id,
+          (progress) => {
+            setUploadingFiles(prev => 
+              prev.map(f => 
+                f.id === uploadingFile.id 
+                  ? { ...f, progress } 
+                  : f
+              )
+            );
+          }
+        );
+
+        // Create file record in database
+        const createdFile = await fileService.create(fileData);
+        
+        if (createdFile) {
+          setFiles(prev => [...prev, createdFile]);
+          toast.success(`${uploadingFile.file.name} uploaded successfully`);
+        } else {
+          toast.error(`Failed to upload ${uploadingFile.file.name}`);
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error(`Failed to upload ${uploadingFile.file.name}`);
+      }
+    }
+
+    // Remove completed uploads
+    setUploadingFiles(prev => 
+      prev.filter(f => !newUploadingFiles.some(nf => nf.id === f.id))
+    );
+  };
+
+  const handleFileDelete = async (fileId) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) return;
+
+    try {
+      const success = await fileService.delete(fileId);
+      if (success) {
+        setFiles(prev => prev.filter(f => f.Id !== fileId));
+        toast.success("File deleted successfully");
+      } else {
+        toast.error("Failed to delete file");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete file");
+    }
+  };
+
+  const renderFilePreview = (file) => {
+    const fileIcon = fileService.getFileIcon(file.type_c);
+    const isImage = file.type_c?.startsWith('image/');
+    
+    return (
+      <div key={file.Id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border">
+        <div className="flex-shrink-0">
+          {isImage ? (
+            <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+              <ApperIcon name="Image" className="h-5 w-5 text-gray-500" />
+            </div>
+          ) : (
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <ApperIcon name={fileIcon} className="h-5 w-5 text-blue-600" />
+            </div>
+          )}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-900 truncate">
+            {file.Name}
+          </p>
+          <p className="text-xs text-gray-500">
+            {fileService.formatFileSize(file.size_c)} • {file.type_c}
+          </p>
+        </div>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleFileDelete(file.Id)}
+          className="text-error hover:bg-error/10 p-1"
+        >
+          <ApperIcon name="Trash2" className="h-4 w-4" />
+        </Button>
+      </div>
+    );
   };
 
   const handleDelete = async () => {
@@ -119,8 +287,7 @@ const TaskModal = ({
       .toUpperCase()
       .slice(0, 2);
   };
-
-  const getPriorityColor = (priority) => {
+const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
         return "error";
@@ -144,7 +311,6 @@ const TaskModal = ({
     { value: "medium", label: "Medium" },
     { value: "high", label: "High" }
   ];
-
   if (!isOpen) return null;
 
   return (
@@ -273,7 +439,7 @@ const TaskModal = ({
                   </div>
                 </div>
 
-                {/* Row 2: Due Date, Progress */}
+{/* Row 2: Due Date, Progress */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="dueDate">Due Date</Label>
@@ -301,6 +467,94 @@ const TaskModal = ({
                     </div>
                   </div>
                 </div>
+
+                {/* File Upload Section */}
+                {task && (
+                  <div className="space-y-4">
+                    <Label>Attachments ({files.length})</Label>
+                    
+                    {/* File Upload Area */}
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                        isDragOver 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-gray-300 hover:border-primary/50'
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      <div className="space-y-3">
+                        <div className="flex justify-center">
+                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                            <ApperIcon name="Upload" className="h-6 w-6 text-gray-500" />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Drag and drop files here, or{' '}
+                            <label className="text-primary hover:text-primary-dark cursor-pointer">
+                              browse
+                              <input
+                                type="file"
+                                multiple
+                                className="hidden"
+                                onChange={handleFileSelect}
+                                accept="*/*"
+                              />
+                            </label>
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Maximum file size: 10MB
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Upload Progress */}
+                    {uploadingFiles.length > 0 && (
+                      <div className="space-y-2">
+                        {uploadingFiles.map((uploadingFile) => (
+                          <div key={uploadingFile.id} className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                            <ApperIcon name="Upload" className="h-4 w-4 text-blue-600" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {uploadingFile.file.name}
+                              </p>
+                              <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div 
+                                  className="bg-primary h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${uploadingFile.progress}%` }}
+                                />
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {Math.round(uploadingFile.progress)}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* File List */}
+                    {loadingFiles ? (
+                      <div className="flex items-center justify-center py-4">
+                        <ApperIcon name="Loader" className="h-5 w-5 animate-spin text-gray-500" />
+                        <span className="ml-2 text-sm text-gray-500">Loading attachments...</span>
+                      </div>
+                    ) : files.length > 0 ? (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {files.map(renderFilePreview)}
+                      </div>
+                    ) : (
+                      <div className="text-center py-4">
+                        <ApperIcon name="FileText" className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No attachments</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
@@ -376,8 +630,7 @@ const TaskModal = ({
                   )}
                 </div>
               </div>
-
-              {/* Comments */}
+{/* Comments */}
               <div className="flex-1 flex flex-col">
                 <div className="p-4 border-b border-gray-200 bg-white">
                   <h3 className="font-semibold text-gray-900 mb-3">
