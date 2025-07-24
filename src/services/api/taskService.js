@@ -341,9 +341,8 @@ export const taskService = {
         total: 0,
         todo: 0,
         inProgress: 0,
-        completed: 0
+completed: 0
       };
     }
-};
-    }
   }
+};
