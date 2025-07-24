@@ -21,8 +21,8 @@ const [currentDate, setCurrentDate] = useState(new Date());
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
   const [taskProjects, setTaskProjects] = useState([]);
-  const { projects, loading: projectsLoading, error: projectsError } = useProjects();
-  const { tasks, loading: tasksLoading, error: tasksError } = useTasks();
+const { projects, loading: projectsLoading, error: projectsError } = useProjects();
+  const { tasks, loading: tasksLoading, error: tasksError, createTask } = useTasks();
 
   const loading = projectsLoading || tasksLoading;
   const error = projectsError || tasksError;
@@ -167,12 +167,14 @@ const handleEventClick = (event) => {
 const handleTaskCreate = async (taskData) => {
     try {
       const projectId = taskProjects[0]?.Id || null;
-      // Note: createTask function needs to be imported from useTasks hook
-      console.log('Task creation data:', {
+      
+      // Use the createTask function from useTasks hook
+      await createTask({
         ...taskData,
         projectId: projectId,
         dueDate: selectedDateForTask ? selectedDateForTask.toISOString() : taskData.dueDate
       });
+      
       setShowTaskModal(false);
       toast.success('Task created successfully');
     } catch (error) {
