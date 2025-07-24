@@ -16,7 +16,7 @@ const ProjectModal = ({ project, isOpen, onClose, onSave }) => {
   const [newMember, setNewMember] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     if (project) {
       setFormData({
         name: project.name || "",

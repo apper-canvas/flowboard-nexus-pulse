@@ -49,7 +49,7 @@ const RecentActivity = ({ activities = [] }) => {
     }
   };
 
-  const formatActivityText = (activity) => {
+const formatActivityText = (activity) => {
     switch (activity.type) {
       case "task_created":
         return `created task "${activity.taskTitle}"`;

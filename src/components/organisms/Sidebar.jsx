@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import ApperIcon from "@/components/ApperIcon";
-import Button from "@/components/atoms/Button";
 import { cn } from "@/utils/cn";
+import ApperIcon from "@/components/ApperIcon";
+import Projects from "@/components/pages/Projects";
+import Button from "@/components/atoms/Button";
 
 const Sidebar = ({ projects = [], onNewProject }) => {
   const { projectId } = useParams();
@@ -127,16 +128,29 @@ const Sidebar = ({ projects = [], onNewProject }) => {
         </div>
       </div>
 
-      {/* Footer */}
+{/* Footer */}
       <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-2 p-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-            <span className="text-xs font-bold text-white">TM</span>
+        <div className="flex items-center justify-between space-x-2 p-2 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-white">TM</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">Team Member</p>
+              <p className="text-xs text-gray-500 truncate">Project Manager</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">Team Member</p>
-            <p className="text-xs text-gray-500 truncate">Project Manager</p>
-          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              // TODO: Implement proper logout functionality
+              console.log('Logout clicked');
+            }}
+            className="h-8 w-8 p-0 rounded-full hover:bg-gray-200"
+          >
+            <ApperIcon name="LogOut" className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>

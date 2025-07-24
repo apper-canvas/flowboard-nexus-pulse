@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 const ProjectDetail = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { projects, loading: projectLoading, updateProject } = useProjects();
+const { projects, loading: projectLoading, updateProject } = useProjects();
   const { tasks, loading: tasksLoading, createTask, updateTask, deleteTask, refetch: refetchTasks } = useTasks(projectId);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskModal, setShowTaskModal] = useState(false);

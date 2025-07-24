@@ -21,7 +21,7 @@ const Dashboard = ({ onNewProject }) => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   // Calculate dashboard stats
-  const stats = {
+const stats = {
     totalProjects: projects.length,
     activeTasks: projects.reduce((sum, p) => sum + (p.taskCounts?.inProgress || 0) + (p.taskCounts?.todo || 0), 0),
     completedTasks: projects.reduce((sum, p) => sum + (p.taskCounts?.completed || 0), 0),

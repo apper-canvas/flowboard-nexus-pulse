@@ -13,8 +13,7 @@ const KanbanBoard = ({ tasks = [], onTaskUpdate, onTaskClick, onNewTask }) => {
     done: { title: "Done", tasks: [], color: "bg-emerald-50" }
   });
 
-  // Organize tasks by status
-  useEffect(() => {
+useEffect(() => {
     const tasksByStatus = {
       todo: tasks.filter(task => task.status === "todo"),
       inprogress: tasks.filter(task => task.status === "inprogress"),

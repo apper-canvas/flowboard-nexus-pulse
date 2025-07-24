@@ -27,7 +27,7 @@ const MyTasks = () => {
   );
 
   // Add project names to tasks
-  const enrichedTasks = myTasks.map(task => {
+const enrichedTasks = myTasks.map(task => {
     const project = projects.find(p => p.Id === task.projectId);
     return {
       ...task,
